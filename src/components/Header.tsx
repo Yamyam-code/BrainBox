@@ -32,7 +32,7 @@ const Container = styled.div`
 `;
 
 const Logo = styled(Link)`
-  padding: 1% 0;
+  padding: 0.5% 0;
 
   font-weight: 700;
 
