@@ -1,10 +1,14 @@
 import HomeMenu from '@/components/Home/HomeMenu';
 import RecentSeens from '@/components/Home/RecentSeens';
 import SummationList from '@/components/Home/SummationList';
+import { Think } from '@/types/userData';
+import { setUserThinks } from '@/utils/firebase';
 import styled from '@emotion/styled';
+import { useEffect, useState } from 'react';
 
 function MyPage() {
-  const thinks = [
+  const [thinks, setThinks] = useState<Think[] | null>();
+  const think = [
     {
       header: '제목입니다.',
       label:
@@ -47,10 +51,19 @@ function MyPage() {
     },
   ];
 
+  useEffect(() => {
+    setUserThinks(setThinks);
+    console.log(import.meta.env.VITE_API_KEY);
+  }, []);
+
+  useEffect(() => {
+    console.log(thinks);
+  }, [thinks]);
+
   return (
     <Container>
       <RecentSeens />
-      <SummationList thinks={thinks} />
+      <SummationList thinks={think} />
       <HomeMenu />
     </Container>
   );
