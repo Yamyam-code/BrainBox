@@ -4,7 +4,7 @@ import RecentSeensHead from './RecentSeensHead';
 import { useState } from 'react';
 
 function LikedStocks() {
-  const [isDown, setIsDown] = useState(true);
+  const [isDown, setIsDown] = useState(false);
 
   return (
     <Container>

@@ -7,9 +7,9 @@ const theme = {
     secondo: '#737272',
   },
   fontSizes: {
-    small: '12px',
-    medium: '16px',
-    large: '25px',
+    small: '0.75rem',
+    medium: '1rem',
+    large: '1.6rem',
   },
   boxShadow: {
     normal: '5px 5px 3px #00000029',

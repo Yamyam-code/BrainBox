@@ -1,7 +1,21 @@
 import { initializeApp } from 'firebase/app';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 import { Think } from '@/types/userData';
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -16,6 +30,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
+const auth = getAuth();
 
 const idDoc = doc(db, 'users', 'id');
 
@@ -60,4 +75,62 @@ async function setUserRecents(
   }
 }
 
-export { getUser, analytics, setUserThinks, setUserRecents };
+async function signUp(email: string, password: string, name: string) {
+  try {
+    const userData = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const docRef = doc(db, 'users', userData.user.uid);
+    const docData = {
+      닉네임: name,
+      이메일: email,
+      recents: [],
+      thinks: [],
+    };
+    setDoc(docRef, docData);
+    console.log(userData.user.uid);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+async function signIn(email: string, password: string) {
+  try {
+    const userData = await signInWithEmailAndPassword(auth, email, password);
+    localStorage.setItem('user', userData.user.uid);
+    console.log(userData.user.uid);
+    return true;
+  } catch (error) {
+    console.log(error);
+    alert('회원정보가 잘못되었습니다.');
+    return false;
+  }
+}
+
+async function duplicate(field: string, confirm: string) {
+  const validate = await query(
+    collection(db, 'users'),
+    where(field, '==', confirm)
+  );
+  const data = await getDocs(validate);
+  if (data.empty) {
+    return 'a';
+  } else {
+    alert(field + '이 이미 존재합니다');
+    return '';
+  }
+}
+
+export {
+  getUser,
+  analytics,
+  setUserThinks,
+  setUserRecents,
+  signUp,
+  signIn,
+  duplicate,
+};

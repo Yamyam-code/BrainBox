@@ -53,12 +53,9 @@ function MyPage() {
 
   useEffect(() => {
     setUserThinks(setThinks);
-    console.log(import.meta.env.VITE_API_KEY);
   }, []);
 
-  useEffect(() => {
-    console.log(thinks);
-  }, [thinks]);
+  useEffect(() => {}, [thinks]);
 
   return (
     <Container>
@@ -74,7 +71,7 @@ const Container = styled.div`
   flex-direction: column;
   gap: 5%;
 
-  padding: 1.5% 2%;
+  padding: 0 2% 1% 2%;
 `;
 
 export default MyPage;

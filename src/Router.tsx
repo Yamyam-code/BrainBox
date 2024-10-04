@@ -6,7 +6,7 @@ function Router() {
   return (
     <Routes>
       <Route index element={<Home />} />
-      <Route path='/Auth' element={<Auth />} />
+      <Route path='/auth' element={<Auth />} />
     </Routes>
   );
 }
