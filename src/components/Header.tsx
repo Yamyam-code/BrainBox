@@ -18,12 +18,21 @@ function Header() {
       setIsLogin(false);
       setLoginLink('/auth?type=login');
     }
-  }, [user]);
+  }, []);
+
+  function logout() {
+    if (user) {
+      localStorage.removeItem('user');
+      location.reload();
+    }
+  }
 
   return (
     <Container>
       <Logo to={'/'}>생각창고</Logo>
-      <Logo to={loginLink}>{isLogin ? <FiLogOut /> : <FiLogIn />}</Logo>
+      <Logo to={loginLink} onClick={logout}>
+        {isLogin ? <FiLogOut /> : <FiLogIn />}
+      </Logo>
     </Container>
   );
 }

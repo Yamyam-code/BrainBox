@@ -82,7 +82,10 @@ function AuthForm({ type }: Props) {
       );
       if (type) {
         const isSucces = await signIn(email, password);
-        if (isSucces) nav('/');
+        if (isSucces) {
+          nav('/');
+          location.reload();
+        }
       } else {
         const isSucces = await signUp(email, password, nickname);
         if (isSucces) nav('/auth?type=login');
