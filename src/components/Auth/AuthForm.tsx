@@ -23,7 +23,7 @@ function AuthForm({ isLogin }: Props) {
     }
 
     if (!isLogin) {
-      if (!duplicates.닉네임 || !duplicates.이메일) {
+      if (!duplicates.nickname || !duplicates.email) {
         alert('닉네임 또는 이메일 중복확인을 해주세요');
         return;
       }
@@ -63,8 +63,8 @@ function AuthForm({ isLogin }: Props) {
             value={form.nickname}
             onChange={handleChange('nickname')}
             error={errors.nickname}
-            onDuplicate={handleDuplicate}
-            duplicateStatus={duplicates.닉네임}
+            onDuplicate={handleDuplicate('nickname')}
+            duplicateStatus={duplicates.nickname}
           />
         )}
         <AuthInputBox
@@ -75,8 +75,8 @@ function AuthForm({ isLogin }: Props) {
           value={form.email}
           onChange={handleChange('email')}
           error={errors.email}
-          onDuplicate={handleDuplicate}
-          duplicateStatus={duplicates.이메일}
+          onDuplicate={handleDuplicate('email')}
+          duplicateStatus={duplicates.email}
         />
         <AuthInputBox
           header='비밀번호'

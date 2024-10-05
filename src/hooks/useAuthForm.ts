@@ -16,8 +16,8 @@ export const useAuthForm = (isLogin: boolean) => {
   });
 
   const [duplicates, setDuplicates] = useState({
-    닉네임: '',
-    이메일: '',
+    nickname: '',
+    email: '',
   });
 
   const [errors, setErrors] = useState({
@@ -35,8 +35,8 @@ export const useAuthForm = (isLogin: boolean) => {
       confirmPassword: '',
     });
     setDuplicates({
-      닉네임: '',
-      이메일: '',
+      nickname: '',
+      email: '',
     });
     setErrors({
       nickname: 'error',
@@ -82,19 +82,22 @@ export const useAuthForm = (isLogin: boolean) => {
     return Object.values(errors).every((error) => error === '');
   };
 
-  async function handleDuplicate(
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    field: string,
-    value: string
-  ) {
-    e.preventDefault();
+  const handleDuplicate =
+    (field: string) =>
+    async (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      value: string
+    ) => {
+      e.preventDefault();
 
-    if (field === '이메일' || field === '닉네임')
-      if (!duplicates[field] && setDuplicates) {
-        const isExist = await duplicate(field, value);
-        setDuplicates({ ...duplicates, [field]: isExist });
-      }
-  }
+      if (field === 'email' || field === 'nickname')
+        if (!duplicates[field] && setDuplicates) {
+          const isExist = await duplicate(field, value);
+          console.log(isExist);
+
+          setDuplicates({ ...duplicates, [field]: isExist });
+        }
+    };
 
   useEffect(() => {
     clearState();

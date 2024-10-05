@@ -13,7 +13,6 @@ interface Props {
   onChange: (value: string) => void;
   onDuplicate?: (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    field: string,
     value: string
   ) => void;
 }
@@ -24,7 +23,7 @@ function AuthInputBox({
   value,
   error,
   info,
-  duplicateStatus = '',
+  duplicateStatus = 'a',
   isLogin,
   onChange,
   onDuplicate,
@@ -45,13 +44,14 @@ function AuthInputBox({
           type={type}
           onChange={onChangeHandler}
           error={error}
+          dup={duplicateStatus}
           value={value}
         />
         {!error && needDuplicate && !isLogin && onDuplicate && (
           <DuplicateBtn
             dup={duplicateStatus}
             onClick={(e) => {
-              onDuplicate(e, header, value);
+              onDuplicate(e, value);
             }}
           >
             {duplicateStatus ? <IoCheckmarkOutline /> : '중복확인'}
@@ -78,7 +78,7 @@ const Container = styled.div`
   box-sizing: border-box;
 `;
 
-const Input = styled.input<{ error: string }>`
+const Input = styled.input<{ error: string; dup: string }>`
   width: 100%;
   height: 30px;
 
@@ -91,7 +91,8 @@ const Input = styled.input<{ error: string }>`
   box-sizing: border-box;
 
   &:focus {
-    border: ${(props) => (!props.error ? '1px solid blue' : '1px solid red')};
+    border: ${(props) =>
+      !props.error && props.dup ? '1px solid blue' : '1px solid red'};
   }
 `;
 

@@ -84,8 +84,8 @@ async function signUp(email: string, password: string, name: string) {
     );
     const docRef = doc(db, 'users', userData.user.uid);
     const docData = {
-      닉네임: name,
-      이메일: email,
+      nickname: name,
+      email: email,
       recents: [],
       thinks: [],
     };
@@ -112,8 +112,12 @@ async function signIn(email: string, password: string) {
 }
 
 async function duplicate(field: string, confirm: string) {
+  console.log(field, confirm);
+
   const validate = query(collection(db, 'users'), where(field, '==', confirm));
   const data = await getDocs(validate);
+  console.log(data.empty);
+
   if (data.empty) {
     return 'a';
   } else {
