@@ -6,19 +6,16 @@ import { FiLogOut } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 function Header() {
-  const [isLogin, setIsLogin] = useState(false);
   const [loginLink, setLoginLink] = useState('/');
   const user = localStorage.getItem('user');
 
   useEffect(() => {
     if (user) {
-      setIsLogin(true);
       setLoginLink('/');
     } else {
-      setIsLogin(false);
       setLoginLink('/auth?type=login');
     }
-  }, []);
+  }, [user]);
 
   function logout() {
     if (user) {
@@ -31,7 +28,7 @@ function Header() {
     <Container>
       <Logo to={'/'}>생각창고</Logo>
       <Logo to={loginLink} onClick={logout}>
-        {isLogin ? <FiLogOut /> : <FiLogIn />}
+        {loginLink === '/' ? <FiLogOut /> : <FiLogIn />}
       </Logo>
     </Container>
   );

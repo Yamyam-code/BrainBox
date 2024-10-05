@@ -17,7 +17,7 @@ function Auth() {
     }
   }, [searchParams]);
 
-  function switchQuery() {
+  function switchUserState() {
     if (isLogin) {
       searchParams.set('type', 'register');
       setSearchParams(searchParams);
@@ -29,8 +29,8 @@ function Auth() {
 
   return (
     <Container>
-      <AuthForm type={isLogin} />
-      <FormChanger onClick={switchQuery}>
+      <AuthForm isLogin={isLogin} />
+      <FormChanger onClick={switchUserState}>
         {isLogin ? '회원가입' : '로그인'}을 하시려면 여기를 클릭해주세요
       </FormChanger>
     </Container>

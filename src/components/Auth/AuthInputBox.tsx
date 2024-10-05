@@ -1,60 +1,40 @@
 import theme from '@/styles/theme';
-import { duplicate } from '@/utils/firebase';
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
 import { IoCheckmarkOutline } from 'react-icons/io5';
 
 interface Props {
   header: string;
-  info: string;
   type?: string;
-  dup?: string;
+  value: string;
+  error: string;
+  info?: string;
+  duplicateStatus?: string;
   isLogin: boolean;
-  set: React.Dispatch<React.SetStateAction<string>>;
-  setDup?: React.Dispatch<React.SetStateAction<string>>;
-  validate?: (info: string) => string;
-  confirm?: (confirm: string) => '' | '비밀번호가 일치하지 않습니다.';
+  onChange: (value: string) => void;
+  onDuplicate?: (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    field: string,
+    value: string
+  ) => void;
 }
 
 function AuthInputBox({
   header,
+  type,
+  value,
+  error,
   info,
-  type = 'text',
+  duplicateStatus = '',
   isLogin,
-  dup = '',
-  set,
-  validate,
-  confirm,
-  setDup,
+  onChange,
+  onDuplicate,
 }: Props) {
-  const [value, setValue] = useState('');
-  const [valid, setValid] = useState('a');
   const needDuplicate =
     header === '닉네임' ? true : header === '이메일' ? true : false;
 
-  useEffect(() => {
-    setValue('');
-  }, [isLogin]);
-
   function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
-    setValue(value);
-    set(value);
-    if (validate) {
-      const confirmed = validate(value);
-      setValid(confirmed);
-    } else if (confirm) {
-      const confirmed = confirm(value);
-      setValid(confirmed);
-    }
-  }
-
-  async function valDup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.preventDefault();
-    if (!dup && setDup) {
-      const isExist = await duplicate(header, value);
-      setDup(isExist);
-    }
+    onChange(value);
   }
 
   return (
@@ -64,17 +44,22 @@ function AuthInputBox({
         <Input
           type={type}
           onChange={onChangeHandler}
-          valid={valid}
+          error={error}
           value={value}
         />
-        {!valid && needDuplicate && !isLogin && (
-          <DuplicateBtn dup={dup} onClick={valDup}>
-            {dup ? <IoCheckmarkOutline /> : '중복확인'}
+        {!error && needDuplicate && !isLogin && onDuplicate && (
+          <DuplicateBtn
+            dup={duplicateStatus}
+            onClick={(e) => {
+              onDuplicate(e, header, value);
+            }}
+          >
+            {duplicateStatus ? <IoCheckmarkOutline /> : '중복확인'}
           </DuplicateBtn>
         )}
       </PositionBox>
-      {valid && <Info>{info}</Info>}
-      {!valid && !dup && !isLogin && needDuplicate && (
+      {error && <Info>{info}</Info>}
+      {!error && !duplicateStatus && !isLogin && needDuplicate && (
         <Info>중복확인 해주세요.</Info>
       )}
     </Container>
@@ -93,7 +78,7 @@ const Container = styled.div`
   box-sizing: border-box;
 `;
 
-const Input = styled.input<{ valid: string }>`
+const Input = styled.input<{ error: string }>`
   width: 100%;
   height: 30px;
 
@@ -106,7 +91,7 @@ const Input = styled.input<{ valid: string }>`
   box-sizing: border-box;
 
   &:focus {
-    border: ${(props) => (!props.valid ? '1px solid blue' : '1px solid red')};
+    border: ${(props) => (!props.error ? '1px solid blue' : '1px solid red')};
   }
 `;
 

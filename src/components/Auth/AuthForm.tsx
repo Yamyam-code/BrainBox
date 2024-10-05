@@ -2,103 +2,50 @@ import theme from '@/styles/theme';
 import styled from '@emotion/styled';
 import BigText from './BigText';
 import AuthInputBox from './AuthInputBox';
-import { useEffect, useState } from 'react';
 import { signIn, signUp } from '@/utils/firebase';
 import { useNavigate } from 'react-router-dom';
-import {
-  validateEmail,
-  validateNickname,
-  validatePassword,
-} from '@/utils/auth';
+import { useAuthForm } from '@/hooks/useAuthForm';
 
 interface Props {
-  type: boolean;
+  isLogin: boolean;
 }
 
-function AuthForm({ type }: Props) {
-  const [nickname, setNickname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [nickNameDuplicate, setNickNameDuplicate] = useState('');
-  const [emailDuplicate, setEmailDuplicate] = useState('');
-  const [errors, setErrors] = useState({
-    nickname: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const nav = useNavigate();
+function AuthForm({ isLogin }: Props) {
+  const { form, handleChange, errors, duplicates, validate, handleDuplicate } =
+    useAuthForm(isLogin);
 
-  useEffect(() => {
-    setNickname('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-    setNickNameDuplicate('');
-    setEmailDuplicate('');
-  }, [type]);
+  const navigate = useNavigate();
 
-  const validateConfirmPassword = (confirm: string) => {
-    if (password !== confirm) {
-      return '비밀번호가 일치하지 않습니다.';
-    }
-    return '';
-  };
-
-  // 제출 시 유효성 검사 실행
   const handleSubmit = async () => {
-    const nicknameError = !type ? validateNickname(nickname) : '';
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
-    const confirmError = !type ? validateConfirmPassword(confirmPassword) : '';
-
-    if (!type && !nickNameDuplicate) {
-      alert('닉네임 중복확인을 해주세요');
+    if (!validate()) {
+      alert('잘 입력했는지 확인해주세요');
       return;
     }
 
-    if (!type && !emailDuplicate) {
-      alert('이메일 중복확인을 해주세요');
-      return;
+    if (!isLogin) {
+      if (!duplicates.닉네임 || !duplicates.이메일) {
+        alert('닉네임 또는 이메일 중복확인을 해주세요');
+        return;
+      }
     }
 
-    // 에러가 있을 경우 상태에 저장
-    setErrors({
-      nickname: nicknameError,
-      email: emailError,
-      password: passwordError,
-      confirmPassword: confirmError,
-    });
-
-    // 에러가 없을 경우 콘솔에 출력 (실제론 폼 제출 동작)
-    if (!nicknameError && !emailError && !passwordError && !confirmError) {
-      console.log(
-        '유효성 검사 통과:',
-        nickname,
-        email,
-        password,
-        confirmPassword
-      );
-      if (type) {
-        const isSucces = await signIn(email, password);
-        if (isSucces) {
-          nav('/');
-          location.reload();
-        }
-      } else {
-        const isSucces = await signUp(email, password, nickname);
-        if (isSucces) nav('/auth?type=login');
+    if (isLogin) {
+      const success = await signIn(form.email, form.password);
+      if (success) {
+        navigate('/');
+        location.reload();
       }
     } else {
-      alert('잘 입력했는지 확인해주세요');
-      console.log('유효성 검사 실패:', errors);
+      const success = await signUp(form.email, form.password, form.nickname);
+      if (success) {
+        navigate('/auth?type=login');
+      }
     }
   };
 
   return (
     <Container>
-      {type ? (
+      {isLogin ? (
         <BigText label='로그인' color={theme.colors.textBlack} height='100px' />
       ) : (
         <BigText
@@ -108,47 +55,52 @@ function AuthForm({ type }: Props) {
         />
       )}
       <InputForm>
-        {!type && (
+        {!isLogin && (
           <AuthInputBox
             header='닉네임'
             info='3~10자의 영어, 한글, 숫자만 입력 가능합니다.'
-            isLogin={type}
-            dup={nickNameDuplicate}
-            set={setNickname}
-            setDup={setNickNameDuplicate}
-            validate={validateNickname}
+            isLogin={isLogin}
+            value={form.nickname}
+            onChange={handleChange('nickname')}
+            error={errors.nickname}
+            onDuplicate={handleDuplicate}
+            duplicateStatus={duplicates.닉네임}
           />
         )}
         <AuthInputBox
           header='이메일'
           info='이메일 형식에 맞춰 입력해주세요.'
-          isLogin={type}
-          dup={emailDuplicate}
-          set={setEmail}
-          setDup={setEmailDuplicate}
-          validate={validateEmail}
+          type='email'
+          isLogin={isLogin}
+          value={form.email}
+          onChange={handleChange('email')}
+          error={errors.email}
+          onDuplicate={handleDuplicate}
+          duplicateStatus={duplicates.이메일}
         />
         <AuthInputBox
           header='비밀번호'
           info='8~12자 영소문자, 숫자, 특수문자를 포함해야 합니다.'
-          isLogin={type}
+          isLogin={isLogin}
           type='password'
-          set={setPassword}
-          validate={validatePassword}
+          value={form.password}
+          onChange={handleChange('password')}
+          error={errors.password}
         />
-        {!type && (
+        {!isLogin && (
           <AuthInputBox
             header='비밀번호 확인'
             info='비밀번호와 같게 입력해주세요'
-            isLogin={type}
+            isLogin={isLogin}
             type='password'
-            set={setConfirmPassword}
-            validate={validateConfirmPassword}
+            value={form.confirmPassword}
+            onChange={handleChange('confirmPassword')}
+            error={errors.confirmPassword}
           />
         )}
       </InputForm>
       <SubmitBtn onClick={handleSubmit}>
-        {type ? '로그인' : '회원가입'}
+        {isLogin ? '로그인' : '회원가입'}
       </SubmitBtn>
     </Container>
   );

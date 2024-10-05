@@ -112,10 +112,7 @@ async function signIn(email: string, password: string) {
 }
 
 async function duplicate(field: string, confirm: string) {
-  const validate = await query(
-    collection(db, 'users'),
-    where(field, '==', confirm)
-  );
+  const validate = query(collection(db, 'users'), where(field, '==', confirm));
   const data = await getDocs(validate);
   if (data.empty) {
     return 'a';
